@@ -33,8 +33,8 @@ Last line of this entire dialog chain as the next valid line is declaring a node
 ```
 
 The dialog engine must warn when:
-	``=`` content is whitespace
-	``->`` goes to invalid nodes
-	``#`` is whitespace or the interpreted returned that it was an invalid operation
-	``<-`` lines contains any other non-whitespace characters, warn that they are ignored
-	when there are leading spaces (not tabs) before ``*``/``#``/``->`` but still accept them as valid normal dialog lines just in case writers want to use those in certain contexts.
+- ``=`` content is whitespace
+- ``->`` goes to invalid nodes
+- ``#`` is whitespace or the interpreted returned that it was an invalid operation
+- ``<-`` lines contains any other non-whitespace characters, warn that they are ignored
+- when there are leading spaces (not tabs) before ``*``/``#``/``->`` but still accept them as valid normal dialog lines just in case writers want to use those in certain contexts.
