@@ -4,7 +4,7 @@
 	using System.IO;
 	using System.Threading;
 	using NLDialog;
-	using Project.Collection;
+	using System.Collections.Generic;
 	using static System.Console;
 	public static class Program
 	{
@@ -66,10 +66,10 @@
 			}
 
 			var tokens = nlParser.TokenAsLines();
-			var issues = KeyValues.New<int, Issue>();
+			var issues = new List<(int line, Issue issue)>();
 			foreach( Issue issue in nlParser.Issues )
 			{
-				issues.Add( issue.SourceLine, issue );
+				issues.Add( (issue.SourceLine, issue) );
 			}
 			
 
@@ -83,24 +83,27 @@
 					var token = tokens[ currentLine ];
 					switch( token )
 					{
-						case Node n: ForegroundColor = ConsoleColor.Blue; break;
+						case Node _: ForegroundColor = ConsoleColor.Blue; break;
 						case null:
-						case Line l: ForegroundColor = ConsoleColor.White; break;
-						case Choice c: ForegroundColor = ConsoleColor.DarkCyan; break;
-						case Comment c: ForegroundColor = ConsoleColor.DarkGreen; break;
-						case Command c: ForegroundColor = ConsoleColor.DarkMagenta; break;
-						case GoBack gb:
-						case GoTo gt:
+						case Line _: ForegroundColor = ConsoleColor.White; break;
+						case Choice _: ForegroundColor = ConsoleColor.DarkCyan; break;
+						case Comment _: ForegroundColor = ConsoleColor.DarkGreen; break;
+						case Command _: ForegroundColor = ConsoleColor.DarkMagenta; break;
+						case GoBack _:
+						case GoTo _:
 							ForegroundColor = ConsoleColor.DarkBlue;
 							break;
 						default: throw new System.NotImplementedException();
 					}
 					Write(line);
-					foreach( var issue in issues[ currentLine ] )
+					foreach( var issue in issues )
 					{
-						ForegroundColor = issue is Error ? ConsoleColor.Red : ConsoleColor.Yellow;
+						if (currentLine != issue.line)
+							continue;
+						
+						ForegroundColor = issue.issue is Error ? ConsoleColor.Red : ConsoleColor.Yellow;
 						Write('\t');
-						Write(issue.Text);
+						Write(issue.issue.Text);
 					}
 					WriteLine();
 				}

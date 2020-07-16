@@ -1,4 +1,4 @@
-﻿/*
+/*
 Here's how dialog are written:
 
 Normal dialog line
@@ -86,7 +86,7 @@ namespace NLDialog
 				Stack<TokenTree> stack = new Stack<TokenTree>();
 				stack.Push( Root );
 				
-				var nodes = KeyValue.NewString<Node>();
+				var nodes = new Dictionary<string, Node>();
 				var goTos = new List<(int line, int charS, GoTo goTo, string key)>();
 
 				{

@@ -5,8 +5,4 @@
         <OutputType>Library</OutputType>
         <TargetFramework>$(LibFW)</TargetFramework>
     </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Project.Base\Project.Base.csproj" />
-    </ItemGroup>
 </Project>
