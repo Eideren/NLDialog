@@ -1,41 +1,7 @@
-/*
-Here's how dialog are written:
-
-Normal dialog line
-/ Line entirely ignored by the engine, can be used as a comment to the person reading straight from the file
-# Line interpreted by the engine, could be used to identify the speaker talking, trigger stuff, apply changes to variables, etc.
-* A Choice
-	Dialog line shown only when selecting this choice
-	* A choice that only shows up if the query returned true        # query to the engine to ask if we can run this choice #
-		Dialog line unique to the choice above this line
-		// The line bellow will force the engine to continue from the line starting with '= Some node' onward instead of continuing on the line below
-		-> Some node
-* Some other choice presented to the player alongside 'A Choice'
-	Dialog line unique to that choice
-Another normal line of dialog that runs after the choices have run their courses
-Last line of this entire dialog chain as the next valid line is declaring a node
-
-= Some node
-// The above line defines a node, we can go to it by starting a line with '->' followed by the name of the node, leading and trailing whitespaces are ignored so '= Some node' and '=    Some node   ' are the same to the engine.
-// The line below specifies that the reader should continue from wherever it came from before, if nothing came up before the dialog ends
-<- 
-
-
-
-The dialog engine must warn when:
-	'=' content is whitespace
-	'->' goes to invalid nodes.
-	'#' is whitespace or maps to invalid operations.
-	'<-' lines contains other non-whitespace characters, that they are ignored
-	when there are leading spaces (not tabs) before '*'/'#'/'->' but still accept them as valid normal dialog lines just in case writers want to use those in certain contexts
-
- */
-
-namespace NLDialog
+﻿namespace NLDialog
 {
 	using System.Collections.Generic;
 	using System.IO;
-	using Project.Collection;
 
 
 
