@@ -39,8 +39,10 @@ leading and trailing whitespaces are ignored so ``= Some node`` and ``=    Some 
 ```
 
 Creating an instance of the parser will parse the provided stream, you can inspect the issues property to find out if there are any. 
+
 The system won't throw if the issue is error worthy, it'll still do its best to run the content you gave it, 
 so you're responsible for throwing if you deem some of those issues to warrant it. 
+
 Here are the issues reported by the parser:
 - Error ``UnexpectedIndentation``, the context around that line does not expect such a level of indentation, the parser could not predict its intent.
 - Error ``TokenEmpty`` when ``#``, ``*``, ``->`` and ``=`` content is empty or made up of whitespace
