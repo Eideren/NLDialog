@@ -4,10 +4,11 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <OutputType>Exe</OutputType>
         <LangVersion>8</LangVersion>
+        <RootNamespace>NLDialogueAnalyzerApp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NLDialog\NLDialog.csproj" />
+      <ProjectReference Include="..\NLDialogue\NLDialogue.csproj" />
       <ProjectReference Include="..\Project.Base\Project.Base.csproj" />
     </ItemGroup>
 

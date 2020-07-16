@@ -1,4 +1,4 @@
-﻿namespace NLDialog
+﻿namespace NLDialogue
 {
 	public abstract class Issue
 	{
@@ -26,7 +26,7 @@
 
 	public class UnexpectedIndentation : Error
 	{
-		public UnexpectedIndentation( int sourceLine, int sourceChar ) : base( sourceLine, sourceChar, "Invalid indentation; the indentation is one or more level too deep, this might result in unexpected dialog flow" )
+		public UnexpectedIndentation( int sourceLine, int sourceChar ) : base( sourceLine, sourceChar, "Invalid indentation; the indentation is one or more level too deep, this might result in unexpected Dialogue flow" )
 		{
 			
 		}

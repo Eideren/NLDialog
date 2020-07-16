@@ -1,4 +1,4 @@
-﻿# Natural Language Dialog
+﻿# Natural Language Dialogue
 
 A tool to build narrations for games, similar to yarn spinner, twine and the likes.
 
@@ -14,27 +14,27 @@ like defining the identify of a speaker, running events, changing variables, etc
 ## The syntax
 The syntax is not as permissive as other similar systems but it makes up for it by being more succinct and instinctive 
 ```
-Normal dialog line
-A second dialog line, presented after the first one
+Normal Dialogue line
+A second Dialogue line, presented after the first one
 // Line entirely ignored by the engine, can be used as a comment to the person reading straight from the file
 
 // Empty/whitespace lines like the one above are entirely skipped
 # A command, this line is sent to your interpreter
 * A Choice
-	Dialog line shown only if the user selected the choice above, must start with a tab character
+	Dialogue line shown only if the user selected the choice above, must start with a tab character
 	* A choice that only shows up if the query returned true    # query to the interpreter to ask if we can run this choice #
-		Dialog line unique to the choice above this line
+		Dialogue line unique to the choice above this line
 		// The line bellow will continue reading from the line starting with '= Some node' onward instead of continuing on the line below
 		-> Some node
 * Some other choice presented to the player alongside 'A Choice'
-	Dialog line unique to that choice
-Another normal line of dialog that runs after the choices have run their courses
-Last line of this entire dialog chain as the next valid line is declaring a node
+	Dialogue line unique to that choice
+Another normal line of Dialogue that runs after the choices have run their courses
+Last line of this entire Dialogue chain as the next valid line is declaring a node
 
 = Some node
 // The above line defines a node, we can start reading from it by starting a line with ``->`` followed by the name of the node, 
 leading and trailing whitespaces are ignored so ``= Some node`` and ``=    Some node   `` are the same to the engine.
-// The line below specifies that the reader should continue from wherever it came from before, if nothing came up before, the dialog ends
+// The line below specifies that the reader should continue from wherever it came from before, if nothing came up before, the Dialogue ends
 <- 
 ```
 

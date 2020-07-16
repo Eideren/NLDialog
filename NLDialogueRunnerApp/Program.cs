@@ -1,10 +1,10 @@
-﻿namespace NLDialogRunnerApp
+﻿namespace NLDialogueRunnerApp
 {
 	using System;
 	using System.Collections.Generic;
 	using System.IO;
 	using System.Threading;
-	using NLDialog;
+	using NLDialogue;
 	using static System.Console;
 	
 	public static class Program

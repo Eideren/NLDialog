@@ -1,4 +1,4 @@
-﻿namespace NLDialog
+﻿namespace NLDialogue
 {
 	public interface IInterpreter
 	{

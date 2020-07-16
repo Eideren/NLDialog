@@ -1,9 +1,9 @@
-﻿namespace NLDialogAnalyzerApp
+﻿namespace NLDialogueAnalyzerApp
 {
 	using System;
 	using System.IO;
 	using System.Threading;
-	using NLDialog;
+	using NLDialogue;
 	using System.Collections.Generic;
 	using static System.Console;
 	public static class Program

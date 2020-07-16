@@ -1,4 +1,4 @@
-﻿namespace NLDialog
+﻿namespace NLDialogue
 {
 	using System;
 	using System.Collections.Generic;
