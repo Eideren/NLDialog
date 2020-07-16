@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <Import Project="..\common_config.props" />
+    
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>$(LibFW)</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Project.Base\Project.Base.csproj" />
+    </ItemGroup>
+</Project>
