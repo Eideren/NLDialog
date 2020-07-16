@@ -93,7 +93,7 @@
 						case GoTo _:
 							ForegroundColor = ConsoleColor.DarkBlue;
 							break;
-						default: throw new System.NotImplementedException();
+						default: throw new NotImplementedException( token.GetType().ToString() );
 					}
 					Write(line);
 					foreach( var issue in issues )

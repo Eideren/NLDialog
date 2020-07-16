@@ -76,7 +76,7 @@
 						
 						if( tabs > stack.Count )
 						{
-							Issues.Add( new IndentationTooDeep( currentLineIndex, i ) );
+							Issues.Add( new UnexpectedIndentation( currentLineIndex, i ) );
 							continue;
 						}
 
@@ -90,7 +90,7 @@
 									topOfStack = stack.Peek();
 									if( ( topOfStack is Choice || topOfStack is Command ) == false )
 									{
-										Issues.Add( new InvalidIndentation( currentLineIndex, i ) );
+										Issues.Add( new UnexpectedIndentation( currentLineIndex, i ) );
 										return;
 									}
 
@@ -105,7 +105,7 @@
 							case ('=', _):
 							{
 								if( tabs != 1 )
-									Issues.Add( new IndentationTooDeep( currentLineIndex, i ) );
+									Issues.Add( new UnexpectedIndentation( currentLineIndex, i ) );
 							
 								var start = i + 1;
 								if( TrimWhitespace( line, ref start, out string text ) )

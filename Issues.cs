@@ -17,7 +17,6 @@
 
 	public abstract class Error : Issue
 	{
-
 		protected Error( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, text )
 		{
 		}
@@ -25,19 +24,9 @@
 
 
 
-	public class IndentationTooDeep : Error
+	public class UnexpectedIndentation : Error
 	{
-		public IndentationTooDeep( int sourceLine, int sourceChar ) : base( sourceLine, sourceChar, "Invalid indentation, the indentation is one or more level too deep, this might result in unexpected dialog flow" )
-		{
-			
-		}
-	}
-
-
-
-	public class InvalidIndentation : Error
-	{
-		public InvalidIndentation( int sourceLine, int sourceChar ) : base( sourceLine, sourceChar, "Invalid indentation" )
+		public UnexpectedIndentation( int sourceLine, int sourceChar ) : base( sourceLine, sourceChar, "Invalid indentation; the indentation is one or more level too deep, this might result in unexpected dialog flow" )
 		{
 			
 		}
@@ -54,18 +43,18 @@
 	
 	
 	
-	public class TokenNonEmpty : Issue
+	public class UnknownNode : Error
 	{
-		public TokenNonEmpty( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, text )
+		public UnknownNode( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, $"Could not find node '{text}' in file" )
 		{
 		}
 	}
 	
 	
 	
-	public class UnknownNode : Error
+	public class TokenNonEmpty : Issue
 	{
-		public UnknownNode( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, $"Could not find node '{text}' in file" )
+		public TokenNonEmpty( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, text )
 		{
 		}
 	}
