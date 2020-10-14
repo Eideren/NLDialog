@@ -34,25 +34,25 @@
 
 				if( _stack.Peek().currentIndex >= _stack.Peek().tree.Children.Count )
 				{
-					if( _stack.Peek().tree is Node )
+					if( _stack.Peek().tree is Scope )
 						return false;
 
 					_stack.Pop();
 					continue;
 				}
 
-				TokenData currentNode; 
+				TokenData currentToken; 
 				{
 					(TokenTree tree, int currentIndex) = _stack.Peek();
-					currentNode = tree.Children[ currentIndex ];
-					if( currentNode is Node == false )
+					currentToken = tree.Children[ currentIndex ];
+					if( currentToken is Scope == false )
 					{
 						_stack.Pop();
 						_stack.Push( ( tree, currentIndex + 1 ) );
 					}
 				}
 
-				switch( currentNode )
+				switch( currentToken )
 				{
 					case Line l: runner.NewLine( l.Text ); return true;
 					case Command c:
@@ -68,9 +68,9 @@
 						_stack.Push( ( gt.Destination, 0 ) );
 						continue;
 					}
-					case GoBack _:
+					case GoBack:
 					{
-						// Pop stack until we're just out of this node
+						// Pop stack until we're just out of this scope
 						TokenTree n;
 						do
 						{
@@ -79,7 +79,7 @@
 
 							n = _stack.Peek().tree;
 							_stack.Pop();
-						} while( n is Node == false );
+						} while( n is Scope == false );
 
 						continue;
 					}
@@ -109,8 +109,8 @@
 						runner.Choices( _choices.GetEnumerator(), this );
 						return true;
 					}
-					case Node _: return false;
-					case Comment _: continue;
+					case Scope: return false;
+					case Comment: continue;
 				}
 			} while( true );
 		}

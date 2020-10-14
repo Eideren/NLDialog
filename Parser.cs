@@ -48,11 +48,11 @@
 		{
 			try
 			{
-				Root = new Node( 0, 0, null );
+				Root = new Scope( 0, 0, null );
 				Stack<TokenTree> stack = new Stack<TokenTree>();
 				stack.Push( Root );
 				
-				var nodes = new Dictionary<string, Node>();
+				var scopes = new Dictionary<string, Scope>();
 				var goTos = new List<(int line, int charS, GoTo goTo, string key)>();
 
 				{
@@ -110,18 +110,18 @@
 								var start = i + 1;
 								if( TrimWhitespace( line, ref start, out string text ) )
 								{
-									// Empty stack, from now on stack starts from this node
+									// Empty stack, from now on stack starts from this scope
 									while( stack.Count != 0 )
 										stack.Pop();
-									var node = new Node( currentLineIndex, start, text );
-									nodes.Add( text, node );
-									stack.Push( node );
-									// Push this node on the base tree
-									Root.Children.Add( node );
+									var scope = new Scope( currentLineIndex, start, text );
+									scopes.Add( text, scope );
+									stack.Push( scope );
+									// Push this scope on the base tree
+									Root.Children.Add( scope );
 								}
 								else
 								{
-									Issues.Add( new TokenEmpty( currentLineIndex, i, $"Looks like a {nameof(Node)}, you should append a name to it" ) );
+									Issues.Add( new TokenEmpty( currentLineIndex, i, $"Looks like a {nameof(Scope)}, you should append a name to it" ) );
 								}
 								continue;
 							}
@@ -213,7 +213,7 @@
 								}
 								else
 								{
-									Issues.Add( new TokenEmpty( currentLineIndex, i, $"Looks like a {nameof(GoTo)}, you must append the name of a node as a destination" ) );
+									Issues.Add( new TokenEmpty( currentLineIndex, i, $"This looks like a {nameof(GoTo)}, {nameof(GoTo)} requires a {nameof(Scope)} name to its right" ) );
 								}
 								continue;
 							}
@@ -240,10 +240,10 @@
 				// Validate gotos
 				foreach( (int line, int charS, GoTo goTo, string key) in goTos )
 				{
-					if( nodes.TryGetValue( key, out var val ) )
+					if( scopes.TryGetValue( key, out var val ) )
 						goTo.Destination = val;
 					else
-						Issues.Add( new UnknownNode( line, charS, key ) );
+						Issues.Add( new UnknownScope( line, charS, key ) );
 				}
 			}
 			catch

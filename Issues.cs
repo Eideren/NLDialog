@@ -43,9 +43,9 @@
 	
 	
 	
-	public class UnknownNode : Error
+	public class UnknownScope : Error
 	{
-		public UnknownNode( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, $"Could not find node '{text}' in file" )
+		public UnknownScope( int sourceLine, int sourceChar, string text ) : base( sourceLine, sourceChar, $"Could not find scope '{text}' in file" )
 		{
 		}
 	}

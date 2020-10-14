@@ -33,8 +33,8 @@
 	
 	public class GoTo : TokenData
 	{
-		public Node Destination{ get; internal set; }
-		public GoTo( int sourceLine, int sourceChar, Node destination ) : base( sourceLine, sourceChar )
+		public Scope Destination{ get; internal set; }
+		public GoTo( int sourceLine, int sourceChar, Scope destination ) : base( sourceLine, sourceChar )
 		{
 			Destination = destination;
 		}
@@ -66,10 +66,10 @@
 		}
 	}
 	
-	public class Node : TokenTree
+	public class Scope : TokenTree
 	{
 		public string Key{ get; protected set; }
-		public Node( int sourceLine, int sourceChar, string key ) : base( sourceLine, sourceChar )
+		public Scope( int sourceLine, int sourceChar, string key ) : base( sourceLine, sourceChar )
 		{
 			Key = key;
 		}

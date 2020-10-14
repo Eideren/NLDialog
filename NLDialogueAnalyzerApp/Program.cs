@@ -83,14 +83,14 @@
 					var token = tokens[ currentLine ];
 					switch( token )
 					{
-						case Node _: ForegroundColor = ConsoleColor.Blue; break;
+						case Scope: ForegroundColor = ConsoleColor.Blue; break;
 						case null:
-						case Line _: ForegroundColor = ConsoleColor.White; break;
-						case Choice _: ForegroundColor = ConsoleColor.DarkCyan; break;
-						case Comment _: ForegroundColor = ConsoleColor.DarkGreen; break;
-						case Command _: ForegroundColor = ConsoleColor.DarkMagenta; break;
-						case GoBack _:
-						case GoTo _:
+						case Line: ForegroundColor = ConsoleColor.White; break;
+						case Choice: ForegroundColor = ConsoleColor.DarkCyan; break;
+						case Comment: ForegroundColor = ConsoleColor.DarkGreen; break;
+						case Command: ForegroundColor = ConsoleColor.DarkMagenta; break;
+						case GoBack:
+						case GoTo:
 							ForegroundColor = ConsoleColor.DarkBlue;
 							break;
 						default: throw new NotImplementedException( token.GetType().ToString() );
