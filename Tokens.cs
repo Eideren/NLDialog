@@ -68,10 +68,10 @@
 	
 	public class Node : TokenTree
 	{
-		public string key{ get; private set; }
+		public string Key{ get; protected set; }
 		public Node( int sourceLine, int sourceChar, string key ) : base( sourceLine, sourceChar )
 		{
-			
+			Key = key;
 		}
 	}
 	
