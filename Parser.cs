@@ -48,19 +48,23 @@
 		{
 			try
 			{
-				Root = new Scope( 0, 0, null );
-				Stack<TokenTree> stack = new Stack<TokenTree>();
-				stack.Push( Root );
+				Root = new Scope( 0, 0, 0, null );
 				
 				var scopes = new Dictionary<string, Scope>();
 				var goTos = new List<(int line, int charS, GoTo goTo, string key)>();
 
 				{
+					Stack<TokenTree> stack = new Stack<TokenTree>();
+					stack.Push( Root );
+					
 					string line;
-					int currentLineIndex = -1;
+					int lineIndex = -1;
+					int nextCharCount = 0;
 					while( ( line = sr.ReadLine() ) != null )
 					{
-						TotalLines = ++currentLineIndex + 1;
+						TotalLines = ++lineIndex + 1;
+						int charIndex = nextCharCount;
+						nextCharCount += line.Length + 1/*The new line char*/;
 						if( string.IsNullOrWhiteSpace( line ) )
 							continue;
 						
@@ -73,10 +77,12 @@
 							else if( char.IsWhiteSpace( line[ i ] ) == false )
 								break;
 						}
+
+						charIndex += i;
 						
 						if( tabs > stack.Count )
 						{
-							Issues.Add( new UnexpectedIndentation( currentLineIndex, i ) );
+							Issues.Add( new UnexpectedIndentation( lineIndex, charIndex ) );
 							continue;
 						}
 
@@ -90,11 +96,10 @@
 									topOfStack = stack.Peek();
 									if( ( topOfStack is Choice || topOfStack is Command ) == false )
 									{
-										Issues.Add( new UnexpectedIndentation( currentLineIndex, i ) );
+										Issues.Add( new UnexpectedIndentation( lineIndex, charIndex ) );
 										return;
 									}
-
-									stack.Pop();
+									stack.Pop().SetRangeEnd( charIndex );
 								}
 							}
 						}
@@ -105,15 +110,16 @@
 							case ('=', _):
 							{
 								if( tabs != 1 )
-									Issues.Add( new UnexpectedIndentation( currentLineIndex, i ) );
+									Issues.Add( new UnexpectedIndentation( lineIndex, charIndex ) );
 							
 								var start = i + 1;
 								if( TrimWhitespace( line, ref start, out string text ) )
 								{
 									// Empty stack, from now on stack starts from this scope
 									while( stack.Count != 0 )
-										stack.Pop();
-									var scope = new Scope( currentLineIndex, start, text );
+										stack.Pop().SetRangeEnd( charIndex );
+
+									var scope = new Scope( lineIndex, charIndex, line.Length - i, text );
 									scopes.Add( text, scope );
 									stack.Push( scope );
 									// Push this scope on the base tree
@@ -121,7 +127,7 @@
 								}
 								else
 								{
-									Issues.Add( new TokenEmpty( currentLineIndex, i, $"Looks like a {nameof(Scope)}, you should append a name to it" ) );
+									Issues.Add( new TokenEmpty( lineIndex, charIndex, $"Looks like a {nameof(Scope)}, you should append a name to it" ) );
 								}
 								continue;
 							}
@@ -130,17 +136,17 @@
 								var start = i + 1;
 								if( TrimWhitespace( line, ref start, out string text ) == false )
 								{
-									Issues.Add( new TokenEmpty( currentLineIndex, i, $"Looks like you want to create a {nameof(Command)} here but you didn't provide the actual command" ) );
+									Issues.Add( new TokenEmpty( lineIndex, charIndex, $"Looks like you want to create a {nameof(Command)} here but you didn't provide the actual command" ) );
 									continue;
 								}
 								
 								if( interpreter.CanInterpretCommand( text, out var warningObj ) == false )
 								{
-									Issues.Add( new FailedToInterpretCommand( currentLineIndex, start, warningObj ) );
+									Issues.Add( new FailedToInterpretCommand( lineIndex, start, warningObj ) );
 									continue;
 								}
 								
-								var token = new Command( currentLineIndex, start, text );
+								var token = new Command( lineIndex, charIndex, line.Length - i, text );
 								stack.Peek().Children.Add( token );
 								stack.Push( token );
 								continue;
@@ -150,7 +156,7 @@
 								var start = i + 1;
 								if( TrimWhitespace( line, ref start, out string cleanLine ) == false )
 								{
-									Issues.Add( new TokenEmpty( currentLineIndex, i, $"Looks like a {nameof(Choice)}, you must append a line of text to this choice" ) );
+									Issues.Add( new TokenEmpty( lineIndex, charIndex, $"Looks like a {nameof(Choice)}, you must append a line of text to this choice" ) );
 									continue;
 								}
 								
@@ -166,7 +172,7 @@
 									firstTokenId += 1;
 									if( TrimWhitespace( cleanLine, ref firstTokenId, out var conditionalText ) == false )
 									{
-										Issues.Add( new TokenEmpty( currentLineIndex, cleanLine.IndexOf( '#' ), $"Looks like a {nameof(ConditionalChoice)}, you must provide a command between its '#'" ) );
+										Issues.Add( new TokenEmpty( lineIndex, cleanLine.IndexOf( '#' ), $"Looks like a {nameof(ConditionalChoice)}, you must provide a command between its '#'" ) );
 										continue;
 									}
 
@@ -175,15 +181,16 @@
 									
 									if( interpreter.CanInterpretConditionalChoice( conditionalText, out var warningObj ) == false )
 									{
-										Issues.Add( new FailedToInterpretConditional( currentLineIndex, firstTokenId, warningObj ) );
+										Issues.Add( new FailedToInterpretConditional( lineIndex, firstTokenId, warningObj ) );
 										continue;
 									}
 
-									token = new ConditionalChoice( currentLineIndex, firstTokenId, conditionalText, cleanLine.Substring( 0, cleanLine.IndexOf( '#' ) ).Trim() );
+									var text = cleanLine.Substring(0, cleanLine.IndexOf('#')).Trim();
+									token = new ConditionalChoice( lineIndex, charIndex, line.Length - i, conditionalText, text );
 								}
 								else
 								{
-									token = new Choice( currentLineIndex, start, cleanLine );
+									token = new Choice( lineIndex, charIndex, line.Length - i, cleanLine );
 								}
 
 								
@@ -196,9 +203,9 @@
 								var start = i + 2;
 								Comment comment;
 								if( TrimWhitespace( line, ref start, out string text ) )
-									comment = new Comment( currentLineIndex, start, text );
+									comment = new Comment( lineIndex, charIndex, line.Length - i, text );
 								else
-									comment = new Comment( currentLineIndex, i, "" );
+									comment = new Comment( lineIndex, charIndex, 2, "" );
 								stack.Peek().Children.Add( comment );
 								continue;
 							}
@@ -207,13 +214,13 @@
 								var start = i + 2;
 								if( TrimWhitespace( line, ref start, out string text ) )
 								{
-									var goTo = new GoTo( currentLineIndex, start, null );
-									goTos.Add( (currentLineIndex, i + 1, goTo, text) );
+									var goTo = new GoTo( lineIndex, charIndex, line.Length - i, null );
+									goTos.Add( (lineIndex, charIndex, goTo, text) );
 									stack.Peek().Children.Add( goTo );
 								}
 								else
 								{
-									Issues.Add( new TokenEmpty( currentLineIndex, i, $"This looks like a {nameof(GoTo)}, {nameof(GoTo)} requires a {nameof(Scope)} name to its right" ) );
+									Issues.Add( new TokenEmpty( lineIndex, charIndex, $"This looks like a {nameof(GoTo)}, {nameof(GoTo)} requires a {nameof(Scope)} name to its right" ) );
 								}
 								continue;
 							}
@@ -221,20 +228,25 @@
 							{
 								var start = i + 2;
 								if( TrimWhitespace( line, ref start, out string text ) )
-									Issues.Add( new TokenNonEmpty( currentLineIndex, start, text ) );
+									Issues.Add( new TokenNonEmpty( lineIndex, charIndex, text ) );
 								
-								stack.Peek().Children.Add( new GoBack( currentLineIndex, i ) );
+								stack.Peek().Children.Add( new GoBack( lineIndex, charIndex, 2 ) );
 								continue;
 							}
 							default:
 							{
 								var start = i;
 								if( TrimWhitespace( line, ref start, out string text ) )
-									stack.Peek().Children.Add( new Line( currentLineIndex, start, text ) );
+									stack.Peek().Children.Add( new Line( lineIndex, charIndex, line.Length - i, text ) );
 								continue;
 							}
 						} // switch
 					} // while
+					
+					// Pop any remaining tokens from the stack and set their ranges
+					while( stack.Count > 0 )
+						stack.Pop().SetRangeEnd( nextCharCount - 1 /* exclude last new line */ );
+					
 				} // scope
 				
 				// Validate gotos
