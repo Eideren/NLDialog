@@ -68,7 +68,7 @@
 						_stack.Push( ( gt.Destination, 0 ) );
 						continue;
 					}
-					case GoBack:
+					case GoBack _:
 					{
 						// Pop stack until we're just out of this scope
 						TokenTree n;
@@ -109,8 +109,8 @@
 						runner.Choices( _choices.GetEnumerator(), this );
 						return true;
 					}
-					case Scope: return false;
-					case Comment: continue;
+					case Scope _: return false;
+					case Comment _: continue;
 				}
 			} while( true );
 		}
