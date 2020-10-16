@@ -44,6 +44,27 @@
 
 
 
+		void RecursiveCheckCommands( TokenTree tree, IInterpreter interpreter )
+		{
+			var children = tree.Children;
+			for (int i = children.Count - 1; i >= 0; i--)
+			{
+				var data = children[i];
+				if (data is Command cmd && interpreter.CanInterpretCommand(cmd.Text, out var warningObj) == false)
+				{
+					Issues.Add(new FailedToInterpretCommand(cmd.SourceLine, cmd.SourceChar, warningObj));
+					children.RemoveAt(i);
+				}
+
+				if (data is TokenTree subTree)
+				{
+					RecursiveCheckCommands(subTree, interpreter);
+				}
+			}
+		}
+
+
+
 		void StartParsing( StreamReader sr, IInterpreter interpreter )
 		{
 			try
@@ -140,14 +161,20 @@
 									continue;
 								}
 								
-								if( interpreter.CanInterpretCommand( text, out var warningObj ) == false )
+								Command token;
+								var siblings = stack.Peek().Children;
+								// Merge commands on the next lines into a single command
+								if( siblings.Count > 0 && siblings[ siblings.Count - 1 ] is Command cmd )
 								{
-									Issues.Add( new FailedToInterpretCommand( lineIndex, start, warningObj ) );
-									continue;
+									siblings.RemoveAt( siblings.Count - 1 );
+									token = new Command( cmd.SourceLine, cmd.SourceChar, ( charIndex + line.Length - i ) - cmd.SourceChar, $"{cmd.Text}\n{text}" );
+								}
+								else
+								{
+									token = new Command( lineIndex, charIndex, line.Length - i, text );
 								}
 								
-								var token = new Command( lineIndex, charIndex, line.Length - i, text );
-								stack.Peek().Children.Add( token );
+								siblings.Add( token );
 								stack.Push( token );
 								continue;
 							}
@@ -257,6 +284,9 @@
 					else
 						Issues.Add( new UnknownScope( line, charS, key ) );
 				}
+				
+				// Validate commands
+				RecursiveCheckCommands( Root, interpreter );
 			}
 			catch
 			{
