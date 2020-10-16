@@ -50,6 +50,7 @@
 				WriteLine( "Please provide path to the file" );
 				inputFile = ReadLine();
 			} while( File.Exists( inputFile ) == false );
+			inputFile = Path.GetFullPath( inputFile );
 			SetFileToWatch( inputFile );
 			Interlocked.Exchange( ref LatestVersion, new Version { Path = inputFile } );
 		}
