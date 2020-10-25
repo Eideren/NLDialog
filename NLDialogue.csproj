@@ -5,5 +5,6 @@
         <OutputType>Library</OutputType>
         <TargetFramework>$(LibFW)</TargetFramework>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
 </Project>

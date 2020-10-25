@@ -81,13 +81,20 @@
 					string line;
 					int lineIndex = -1;
 					int nextCharCount = 0;
+					bool lineIsEmpty = false;
 					while( ( line = sr.ReadLine() ) != null )
 					{
 						TotalLines = ++lineIndex + 1;
 						int charIndex = nextCharCount;
 						nextCharCount += line.Length + 1/*The new line char*/;
-						if( string.IsNullOrWhiteSpace( line ) )
+						if (string.IsNullOrWhiteSpace(line))
+						{
+							lineIsEmpty = true;
 							continue;
+						}
+
+						bool previousLineWasEmpty = lineIsEmpty;
+						lineIsEmpty = false;
 						
 						int tabs = 1;
 						int i = 0;
@@ -104,6 +111,7 @@
 						if( tabs > stack.Count )
 						{
 							Issues.Add( new UnexpectedIndentation( lineIndex, charIndex ) );
+							lineIsEmpty = true;
 							continue;
 						}
 
@@ -164,7 +172,7 @@
 								Command token;
 								var siblings = stack.Peek().Children;
 								// Merge commands on the next lines into a single command
-								if( siblings.Count > 0 && siblings[ siblings.Count - 1 ] is Command cmd )
+								if( siblings.Count > 0 && siblings[ siblings.Count - 1 ] is Command cmd && previousLineWasEmpty == false )
 								{
 									siblings.RemoveAt( siblings.Count - 1 );
 									token = new Command( cmd.SourceLine, cmd.SourceChar, ( charIndex + line.Length - i ) - cmd.SourceChar, $"{cmd.Text}\n{text}" );
