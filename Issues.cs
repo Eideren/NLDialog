@@ -65,7 +65,7 @@
 	{
 		public object IssueObject{ get; private set; }
 		
-		protected InterpreterIssue( int sourceLine, int sourceChar, object issueObject ) : base( sourceLine, sourceChar, issueObject?.ToString() )
+		protected InterpreterIssue( int sourceLine, int sourceChar, object issueObject ) : base( sourceLine, sourceChar, issueObject.ToString() )
 		{
 			IssueObject = issueObject;
 		}

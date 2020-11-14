@@ -2,8 +2,8 @@
 {
 	public interface IInterpreter
 	{
-		bool CanInterpretCommand( string command, out object warning );
-		bool CanInterpretConditionalChoice( string commandForChoice, out object warning );
+		bool CanInterpretCommand( string command, out object? warning );
+		bool CanInterpretConditionalChoice( string commandForChoice, out object? warning );
 	}
 
 
@@ -13,12 +13,12 @@
 	/// </summary>
 	public class NullInterpreter : IInterpreter
 	{
-		public bool CanInterpretCommand( string command, out object warning )
+		public bool CanInterpretCommand( string command, out object? warning )
 		{
 			warning = null; 
 			return true;
 		}
-		public bool CanInterpretConditionalChoice( string commandForChoice, out object warning )
+		public bool CanInterpretConditionalChoice( string commandForChoice, out object? warning )
 		{
 			warning = null; 
 			return true;

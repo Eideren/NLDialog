@@ -8,8 +8,8 @@
 	using static System.Console;
 	public static class Program
 	{
-		static Version LatestVersion;
-		static FileSystemWatcher FileWatched;
+		static Version? LatestVersion;
+		static FileSystemWatcher? FileWatched;
 		static SemaphoreSlim Semaphore = new SemaphoreSlim( 0 );
 
 
@@ -17,18 +17,18 @@
 		class Version
 		{
 			public string Path;
+			public Version( string path ) => Path = path;
 		}
 
 
 
 		public static void Main()
 		{
-			Version previousVersion = null;
 			ASK_FOR_FILE:
 			AskForFile();
 			REDRAW:
-			previousVersion = Volatile.Read( ref LatestVersion );
-			Redraw(previousVersion.Path);
+			Version? previousVersion = Volatile.Read( ref LatestVersion );
+			Redraw(previousVersion!.Path);
 			while( true )
 			{
 				Semaphore.Wait( TimeSpan.FromMilliseconds( 200 ) );
@@ -48,11 +48,11 @@
 			do
 			{
 				WriteLine( "Please provide path to the file" );
-				inputFile = ReadLine();
+				inputFile = ReadLine() ?? "";
 			} while( File.Exists( inputFile ) == false );
 			inputFile = Path.GetFullPath( inputFile );
 			SetFileToWatch( inputFile );
-			Interlocked.Exchange( ref LatestVersion, new Version { Path = inputFile } );
+			Interlocked.Exchange( ref LatestVersion, new Version(inputFile) );
 		}
 
 
@@ -76,7 +76,7 @@
 
 			using( StreamReader sr = new StreamReader( path ) )
 			{	
-				string line;
+				string? line;
 				int currentLine = -1;
 				while( (line = sr.ReadLine()) != null )
 				{
@@ -123,7 +123,7 @@
 			};
 			fsw.Changed += ( s, e ) =>
 			{
-				Interlocked.Exchange( ref LatestVersion, new Version { Path = e.FullPath } );
+				Interlocked.Exchange( ref LatestVersion, new Version(e.FullPath) );
 				Semaphore.Release();
 			};
 			Interlocked.Exchange( ref FileWatched, fsw )?.Dispose();

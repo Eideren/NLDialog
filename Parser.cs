@@ -1,15 +1,16 @@
 ﻿namespace NLDialogue
 {
 	using System.Collections.Generic;
+	using System.Diagnostics.CodeAnalysis;
 	using System.IO;
 
 
 
 	public class Parser
 	{
-		public TokenTree Root{ get; private set; }
+		public readonly TokenTree Root = new Scope( 0, 0, 0, "" );
 		public int TotalLines{ get; private set; }
-		public List<Issue> Issues{ get; private set; } = new List<Issue>();
+		public readonly List<Issue> Issues = new List<Issue>();
 		public bool ContainsErrors{ get; private set; }
 
 
@@ -52,7 +53,7 @@
 				var data = children[i];
 				if (data is Command cmd && interpreter.CanInterpretCommand(cmd.Text, out var warningObj) == false)
 				{
-					Issues.Add(new FailedToInterpretCommand(cmd.SourceLine, cmd.SourceChar, warningObj));
+					Issues.Add(new FailedToInterpretCommand(cmd.SourceLine, cmd.SourceChar, warningObj ?? "null"));
 					children.RemoveAt(i);
 				}
 
@@ -69,8 +70,6 @@
 		{
 			try
 			{
-				Root = new Scope( 0, 0, 0, null );
-				
 				var scopes = new Dictionary<string, Scope>();
 				var goTos = new List<(int line, int charS, GoTo goTo, string key)>();
 
@@ -78,7 +77,7 @@
 					Stack<TokenTree> stack = new Stack<TokenTree>();
 					stack.Push( Root );
 					
-					string line;
+					string? line;
 					int lineIndex = -1;
 					int nextCharCount = 0;
 					bool lineIsEmpty = false;
@@ -142,7 +141,7 @@
 									Issues.Add( new UnexpectedIndentation( lineIndex, charIndex ) );
 							
 								var start = i + 1;
-								if( TrimWhitespace( line, ref start, out string text ) )
+								if( TrimWhitespace( line, ref start, out var text ) )
 								{
 									// Empty stack, from now on stack starts from this scope
 									while( stack.Count != 0 )
@@ -163,7 +162,7 @@
 							case ('#', _):
 							{
 								var start = i + 1;
-								if( TrimWhitespace( line, ref start, out string text ) == false )
+								if( TrimWhitespace( line, ref start, out var text ) == false )
 								{
 									Issues.Add( new TokenEmpty( lineIndex, charIndex, $"Looks like you want to create a {nameof(Command)} here but you didn't provide the actual command" ) );
 									continue;
@@ -189,7 +188,7 @@
 							case ('*', _):
 							{
 								var start = i + 1;
-								if( TrimWhitespace( line, ref start, out string cleanLine ) == false )
+								if( TrimWhitespace( line, ref start, out var cleanLine ) == false )
 								{
 									Issues.Add( new TokenEmpty( lineIndex, charIndex, $"Looks like a {nameof(Choice)}, you must append a line of text to this choice" ) );
 									continue;
@@ -216,7 +215,7 @@
 									
 									if( interpreter.CanInterpretConditionalChoice( conditionalText, out var warningObj ) == false )
 									{
-										Issues.Add( new FailedToInterpretConditional( lineIndex, firstTokenId, warningObj ) );
+										Issues.Add( new FailedToInterpretConditional( lineIndex, firstTokenId, warningObj ?? "null" ) );
 										continue;
 									}
 
@@ -237,7 +236,7 @@
 							{
 								var start = i + 2;
 								Comment comment;
-								if( TrimWhitespace( line, ref start, out string text ) )
+								if( TrimWhitespace( line, ref start, out var text ) )
 									comment = new Comment( lineIndex, charIndex, line.Length - i, text );
 								else
 									comment = new Comment( lineIndex, charIndex, 2, "" );
@@ -247,9 +246,9 @@
 							case ('-', '>'):
 							{
 								var start = i + 2;
-								if( TrimWhitespace( line, ref start, out string text ) )
+								if( TrimWhitespace( line, ref start, out var text ) )
 								{
-									var goTo = new GoTo( lineIndex, charIndex, line.Length - i, null );
+									var goTo = new GoTo( lineIndex, charIndex, line.Length - i, null!/* Is set later */ );
 									goTos.Add( (lineIndex, charIndex, goTo, text) );
 									stack.Peek().Children.Add( goTo );
 								}
@@ -262,7 +261,7 @@
 							case ('<', '-'):
 							{
 								var start = i + 2;
-								if( TrimWhitespace( line, ref start, out string text ) )
+								if( TrimWhitespace( line, ref start, out var text ) )
 									Issues.Add( new TokenNonEmpty( lineIndex, charIndex, text ) );
 								
 								stack.Peek().Children.Add( new GoBack( lineIndex, charIndex, 2 ) );
@@ -271,7 +270,7 @@
 							default:
 							{
 								var start = i;
-								if( TrimWhitespace( line, ref start, out string text ) )
+								if( TrimWhitespace( line, ref start, out var text ) )
 									stack.Peek().Children.Add( new Line( lineIndex, charIndex, line.Length - i, text ) );
 								continue;
 							}
@@ -320,7 +319,7 @@
 			}
 		}
 		
-		static bool TrimWhitespace( string str, ref int start, out string output )
+		static bool TrimWhitespace( string str, ref int start, [MaybeNullWhen(false)] out string output )
 		{
 			while( start < str.Length )
 			{
